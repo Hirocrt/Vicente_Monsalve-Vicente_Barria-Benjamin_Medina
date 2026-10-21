@@ -3,10 +3,9 @@ from models.conexion import ConexionDB
 
 
 class Departamento:
-    # Modelo de la tabla departamentos
     id_departamento: int
     nombre_departamento: str
-    id_gerente: int  # id de un empleado; puede ser None
+    id_gerente: int 
 
     def __init__(self):
         self.id_departamento = None
@@ -18,7 +17,6 @@ class Departamento:
         return f"ID: {self.id_departamento} | Departamento: {self.nombre_departamento}"
 
     def existeEmpleado(self, idEmpleado):
-        # Solo LEE la tabla empleados (no la modifica) para validar al gerente
         c = ConexionDB()
         try:
             sql = "SELECT 1 FROM empleados WHERE id_empleado = :id"
@@ -28,7 +26,6 @@ class Departamento:
             c.conexion.close()
 
     def validar(self):
-        # Se valida ANTES de guardar. Si algo está mal, se lanza ValueError.
         nombre = (self.nombre_departamento or "").strip()
         if nombre == "":
             raise ValueError("El nombre del departamento es obligatorio.")
@@ -42,12 +39,10 @@ class Departamento:
             if not self.existeEmpleado(self.id_gerente):
                 raise ValueError(f"No existe un empleado con ID {self.id_gerente}.")
 
-    # CREATE
     def insertar(self):
         self.validar()
         c = ConexionDB()
         try:
-            # RETURNING ... INTO le pide a Oracle el ID que acaba de generar
             sql = """INSERT INTO departamentos (nombre_departamento, id_gerente)
                      VALUES (:nom, :gerente)
                      RETURNING id_departamento INTO :id_nuevo"""
@@ -58,14 +53,13 @@ class Departamento:
             self.id_departamento = id_nuevo.getvalue()[0]
         except oracledb.IntegrityError as error:
             c.conexion.rollback()
-            # ORA-00001 = el nombre ya existe (restricción UNIQUE)
             if error.args[0].code == 1:
                 raise ValueError("Ya existe un departamento con ese nombre.") from error
             raise
         finally:
             c.conexion.close()
 
- # READ: listar todos los departamentos
+
     def obtenerTodos(self):
         c = ConexionDB()
         try:
@@ -75,13 +69,11 @@ class Departamento:
                      LEFT JOIN usuarios u ON e.id_usuario = u.id_usuario
                      ORDER BY d.id_departamento"""
             c.cursor.execute(sql)
-            # fetchall() retorna una LISTA de TUPLAS (vacía si no hay departamentos)
             return c.cursor.fetchall()
         finally:
             c.conexion.close()
 
 
-     # READ: buscar un departamento por su ID (buscar() del UML)
     def cargarPorID(self, idBuscado):
         c = ConexionDB()
         try:
@@ -92,7 +84,6 @@ class Departamento:
                      WHERE d.id_departamento = :id"""
             c.cursor.execute(sql, id=idBuscado)
             fila = c.cursor.fetchone()
-            # fetchone() retorna None si no hay resultado
             if fila is None:
                 return False
             self.id_departamento = fila[0]
@@ -105,7 +96,6 @@ class Departamento:
 
 
 
-     # UPDATE (editar()
     def actualizar(self):
         self.validar()
         c = ConexionDB()
@@ -115,13 +105,13 @@ class Departamento:
                      WHERE id_departamento = :id"""
             c.cursor.execute(sql, nom=self.nombre_departamento,
                              gerente=self.id_gerente, id=self.id_departamento)
-            # rowcount indica cuántas filas modificó el UPDATE
+            
             if c.cursor.rowcount == 0:
                 raise ValueError("No existe un departamento con ese ID.")
             c.conexion.commit()
         except oracledb.IntegrityError as error:
             c.conexion.rollback()
-            # ORA-00001 = ya existe otro departamento con ese nombre
+
             if error.args[0].code == 1:
                 raise ValueError("Ya existe un departamento con ese nombre.") from error
             raise
@@ -129,9 +119,8 @@ class Departamento:
             c.conexion.close()
 
 
-     # READ auxiliar: cuántos empleados pertenecen a un departamento
     def contarEmpleados(self, idDepartamento):
-        # Solo LEE la tabla empleados (no la modifica)
+  
         c = ConexionDB()
         try:
             sql = "SELECT COUNT(*) FROM empleados WHERE id_departamento = :id"
@@ -140,13 +129,13 @@ class Departamento:
         finally:
             c.conexion.close()
 
-    # DELETE (eliminar() del UML)
+
     def eliminar(self, idEliminar):
         c = ConexionDB()
         try:
             sql = "DELETE FROM departamentos WHERE id_departamento = :id"
             c.cursor.execute(sql, id=idEliminar)
-            # rowcount indica cuántas filas borró el DELETE
+       
             if c.cursor.rowcount == 0:
                 raise ValueError("No existe un departamento con ese ID.")
             c.conexion.commit()
