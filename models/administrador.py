@@ -38,7 +38,7 @@ class Administrador:
             sql = "INSERT INTO administradores (id_usuario, rol) VALUES (:idu, :rol)"
             c.cursor.execute(sql, idu=self.id_usuario, rol=self.rol)
             c.conexion.commit()
-            print("¡Administrador insertado correctamente!")
+            print("Administrador insertado ")
         except Exception as e:
             print(f"ERROR al insertar en la Base de Datos: {e}")
         finally:
@@ -53,7 +53,7 @@ class Administrador:
             sql = "UPDATE administradores SET id_usuario=:idu, rol=:rol WHERE id_administrador=:id"
             c.cursor.execute(sql, id=self.id_administrador, idu=self.id_usuario, rol=self.rol)
             c.conexion.commit()
-            print("¡Administrador actualizado correctamente!")
+            print("Administrador actualizado ")
         except Exception as e:
             print(f"ERROR al actualizar en la Base de Datos: {e}")
         finally:
@@ -92,7 +92,7 @@ class Administrador:
             sql = "DELETE FROM administradores WHERE id_administrador = :id"
             c.cursor.execute(sql, id=idEliminar)
             c.conexion.commit()
-            print("¡Administrador eliminado correctamente!")
+            print("Administrador eliminado")
         except Exception as e:
             print(f"ERROR al eliminar en la Base de Datos: {e}")
         finally:

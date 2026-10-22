@@ -9,10 +9,10 @@ class Usuario:
     telefono: str
     correo: str
     inicio_contrato: str
-    salario: int
+    salario: int        #valor declarado
 
     def __init__(self, id_usuario: int = 0, nombre: str = "", contrasena: str = "", direccion: str = "",
-                 telefono: str = "", correo: str = "", inicio_contrato: str = "", salario: int = 0):
+                 telefono: str = "", correo: str = "", inicio_contrato: str = "", salario: int = 0):  #parametro
         self.id_usuario = id_usuario
         self.nombre = nombre
         self.contrasena = contrasena
@@ -49,7 +49,7 @@ class Usuario:
                              tel=self.telefono, correo=self.correo, fec=self.inicio_contrato,
                              salario=self.salario)
             c.conexion.commit()
-            print("¡Usuario insertado correctamente!")
+            print("Usuario insertado")
         except Exception as e:
             print(f"ERROR al insertar en la Base de Datos: {e}")
         finally:
@@ -68,7 +68,7 @@ class Usuario:
                              direc=self.direccion, tel=self.telefono, correo=self.correo,
                              fec=self.inicio_contrato, salario=self.salario)
             c.conexion.commit()
-            print("¡Usuario actualizado correctamente!")
+            print("Usuario actualizado")
         except Exception as e:
             print(f"ERROR al actualizar en la Base de Datos: {e}")
         finally:
@@ -113,7 +113,7 @@ class Usuario:
             sql = "DELETE FROM usuarios WHERE id_usuario = :id"
             c.cursor.execute(sql, id=idEliminar)
             c.conexion.commit()
-            print("¡Usuario eliminado correctamente!")
+            print("Usuario eliminado")
         except Exception as e:
             print(f"ERROR al eliminar en la Base de Datos: {e}")
         finally:
